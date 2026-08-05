@@ -257,6 +257,7 @@
       line-height: 1.6;
     }
 
+    /* Direct Link Button Styling */
     .btn {
       background-color: var(--ios-accent);
       color: white;
@@ -271,7 +272,12 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: transform 0.15s ease;
+      text-decoration: none;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .btn:hover {
+      background-color: #0062cc;
     }
 
     .btn:active {
@@ -293,126 +299,6 @@
       color: #ff3b30;
       border-color: #ffb3b0;
       background-color: #fff2f2;
-    }
-
-    /* 💎 PERFECT RESPONSIVE FULL VIEW MODAL 💎 */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      transition: opacity 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
-    }
-
-    .modal.show {
-      display: flex;
-      opacity: 1;
-    }
-
-    .modal-container {
-      background: #0f172a;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transform: scale(0.96);
-      transition: transform 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
-    }
-
-    .modal.show .modal-container {
-      transform: scale(1);
-    }
-
-    .modal-header {
-      padding: 12px 20px;
-      background: #0f172a;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      height: 56px;
-      flex-shrink: 0;
-      z-index: 20;
-    }
-
-    .back-btn {
-      background: var(--ios-accent);
-      border: none;
-      color: white;
-      padding: 8px 18px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .modal-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 45%;
-    }
-
-    .open-ext-btn {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: white;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .modal-body {
-      flex: 1;
-      width: 100%;
-      height: calc(100vh - 56px);
-      background: #1e293b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Auto Match Any Screen Size */
-    .modal-body iframe {
-      width: 100%;
-      height: 100%;
-      max-width: 100%;
-      max-height: 100%;
-      border: none;
-      display: block;
-      margin: 0 auto;
-    }
-
-    .iframe-loader {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: #0f172a;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-size: 16px;
-      color: #ffffff;
-      gap: 12px;
-      z-index: 10;
     }
 
     @media (max-width: 1024px) {
@@ -499,31 +385,6 @@
     </main>
   </div>
 
-  <!-- Smooth Animated Full View Modal -->
-  <div class="modal" id="cvModal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <button class="back-btn" onclick="closeCV()">
-          <i class="fa-solid fa-arrow-left"></i> Back
-        </button>
-
-        <span class="modal-title" id="modalCandidateName">Candidate CV</span>
-
-        <a id="extLink" href="#" target="_blank" class="open-ext-btn">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Original
-        </a>
-      </div>
-
-      <div class="modal-body">
-        <div class="iframe-loader" id="iframeLoader">
-          <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
-          <span>Loading Document...</span>
-        </div>
-        <iframe id="pdfFrame" src="" onload="hideLoader()"></iframe>
-      </div>
-    </div>
-  </div>
-
   <script>
     const SUPABASE_URL = "https://ksyxmoqzcghszrhlpaxh.supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_U289_qf4pkGHp-G1C4kX5w_2bztcmOg";
@@ -599,12 +460,22 @@
               ${country ? `<p><i class="fa-solid fa-earth-americas"></i> ${country}</p>` : ''}
             </div>
           </div>
-          <button class="btn" onclick="openCV('${pdfUrl}', '${name.replace(/'/g, "\\'")}')">
-            <i class="fa-solid fa-file-pdf"></i> View CV
-          </button>
+          <a href="${pdfUrl}" target="_blank" rel="noopener noreferrer" class="btn" onclick="return checkPDF(event, '${pdfUrl}')">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> View CV
+          </a>
         `;
         grid.appendChild(card);
       });
+    }
+
+    // PDF link එක valid ද කියා පරීක්ෂා කර Direct Open කිරීමට
+    function checkPDF(event, url) {
+      if (!url || url === '#' || url === 'null') {
+        event.preventDefault();
+        alert("This candidate does not have a valid CV file uploaded.");
+        return false;
+      }
+      return true;
     }
 
     function filterCategory(type, value, element) {
@@ -662,48 +533,6 @@
         return name.includes(query) || job.includes(query) || country.includes(query) || wType.includes(query);
       });
       renderCandidates(filtered);
-    }
-
-    // 🌟 FULL VIEW SCREEN AUTO-FIT SYSTEM 🌟
-    function openCV(pdfUrl, candidateName) {
-      if (!pdfUrl || pdfUrl === '#' || pdfUrl === 'null') {
-        alert("This candidate does not have a valid CV file uploaded.");
-        return;
-      }
-      
-      document.getElementById('modalCandidateName').innerText = candidateName;
-      document.getElementById('extLink').href = pdfUrl;
-      
-      const loader = document.getElementById('iframeLoader');
-      const iframe = document.getElementById('pdfFrame');
-      const modal = document.getElementById('cvModal');
-      
-      loader.style.display = 'flex';
-
-      // Auto-fit to Screen Viewport via URL parameters
-      iframe.src = pdfUrl + "#toolbar=0&navpanes=0&view=Fit&scrollbar=1";
-
-      modal.style.display = 'flex';
-      setTimeout(() => {
-        modal.classList.add('show');
-      }, 10);
-
-      document.body.style.overflow = 'hidden';
-    }
-
-    function hideLoader() {
-      document.getElementById('iframeLoader').style.display = 'none';
-    }
-
-    function closeCV() {
-      const modal = document.getElementById('cvModal');
-      modal.classList.remove('show');
-      
-      setTimeout(() => {
-        modal.style.display = 'none';
-        document.getElementById('pdfFrame').src = '';
-        document.body.style.overflow = 'auto';
-      }, 250);
     }
 
     window.onload = fetchCandidates;
