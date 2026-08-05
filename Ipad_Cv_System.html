@@ -8,8 +8,14 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Supabase JS Client (v2 CDN) -->
+  <!-- Primary Supabase JS Client (v2 CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Fallback CDN for iPad / Safari Restrictions -->
+  <script>
+    if (typeof supabase === 'undefined') {
+      document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+    }
+  </script>
 
   <style>
     :root {
@@ -497,21 +503,31 @@
     let _supabase = null;
     let allCandidates = [];
 
-    if (typeof supabase !== 'undefined') {
-      _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Helper Function to wait for Supabase library to load on slower connections/iPad
+    async function getSupabaseClient() {
+      let retries = 0;
+      while (typeof supabase === 'undefined' && retries < 10) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        retries++;
+      }
+      if (typeof supabase !== 'undefined' && !_supabase) {
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      return _supabase;
     }
 
-    // Fetch Candidates
+    // Fetch Candidates with Async Retry Check
     async function fetchCandidates() {
       const grid = document.getElementById('candidateGrid');
+      const client = await getSupabaseClient();
 
-      if (!_supabase) {
-        grid.innerHTML = `<div class="status-msg error-msg">Supabase SDK connection failed!</div>`;
+      if (!client) {
+        grid.innerHTML = `<div class="status-msg error-msg">Supabase SDK connection failed! Please check your network or refresh.</div>`;
         return;
       }
 
       try {
-        const { data, error } = await _supabase
+        const { data, error } = await client
           .from('talents')
           .select('*')
           .order('created_at', { ascending: false });
