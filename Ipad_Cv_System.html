@@ -8,15 +8,6 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Primary Supabase JS Client (v2 CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Fallback CDN for iPad / Safari Restrictions -->
-  <script>
-    if (typeof supabase === 'undefined') {
-      document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
-    }
-  </script>
-
   <style>
     :root {
       --ios-bg: #f2f2f7;
@@ -500,43 +491,29 @@
     const SUPABASE_URL = "https://ksyxmoqzcghszrhlpaxh.supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_U289_qf4pkGHp-G1C4kX5w_2bztcmOg";
 
-    let _supabase = null;
     let allCandidates = [];
 
-    // Helper Function to wait for Supabase library to load on slower connections/iPad
-    async function getSupabaseClient() {
-      let retries = 0;
-      while (typeof supabase === 'undefined' && retries < 10) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        retries++;
-      }
-      if (typeof supabase !== 'undefined' && !_supabase) {
-        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      }
-      return _supabase;
-    }
-
-    // Fetch Candidates with Async Retry Check
+    // Native Fetch API directly to Supabase REST Endpoint (No SDK Required - Works 100% on iPad/iOS Safari)
     async function fetchCandidates() {
       const grid = document.getElementById('candidateGrid');
-      const client = await getSupabaseClient();
-
-      if (!client) {
-        grid.innerHTML = `<div class="status-msg error-msg">Supabase SDK connection failed! Please check your network or refresh.</div>`;
-        return;
-      }
+      
+      const endpoint = `${SUPABASE_URL}/rest/v1/talents?select=*&order=created_at.desc`;
 
       try {
-        const { data, error } = await client
-          .from('talents')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const response = await fetch(endpoint, {
+          method: 'GET',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
-        if (error) {
-          console.error("Database Error:", error);
-          grid.innerHTML = `<div class="status-msg error-msg"><i class="fa-solid fa-circle-exclamation"></i> Error loading data: ${error.message}</div>`;
-          return;
+        if (!response.ok) {
+          throw new Error(`HTTP Error status: ${response.status}`);
         }
+
+        const data = await response.json();
 
         if (data && data.length > 0) {
           allCandidates = data;
@@ -547,8 +524,8 @@
         }
 
       } catch (err) {
-        console.error('Connection Error:', err);
-        grid.innerHTML = `<div class="status-msg error-msg"><i class="fa-solid fa-triangle-exclamation"></i> Connection failed!</div>`;
+        console.error('Fetch Connection Error:', err);
+        grid.innerHTML = `<div class="status-msg error-msg"><i class="fa-solid fa-triangle-exclamation"></i> Connection failed: ${err.message}</div>`;
       }
     }
 
