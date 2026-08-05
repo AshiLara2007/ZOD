@@ -30,10 +30,6 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
-      height: 100%;
-    }
-
     body {
       background-color: var(--ios-bg);
       color: var(--ios-text);
@@ -299,14 +295,12 @@
       background-color: #fff2f2;
     }
 
-    /* 💎 PERFECT RESPONSIVE FULL VIEW MODAL — FIXED TO MATCH ANY SCREEN SIZE 💎 */
+    /* 💎 PERFECT RESPONSIVE FULL VIEW MODAL 💎 */
     .modal {
       display: none;
       position: fixed;
       top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh; /* handles mobile browser address bar collapsing */
+      width: 100vw; height: 100vh;
       background: rgba(0, 0, 0, 0.85);
       z-index: 9999;
       justify-content: center;
@@ -324,12 +318,10 @@
       background: #0f172a;
       width: 100vw;
       height: 100vh;
-      height: 100dvh; /* fixes iOS/Android viewport mismatch */
       display: flex;
       flex-direction: column;
       transform: scale(0.96);
       transition: transform 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
-      overflow: hidden;
     }
 
     .modal.show .modal-container {
@@ -337,14 +329,14 @@
     }
 
     .modal-header {
-      padding: 10px 16px;
+      padding: 12px 20px;
       background: #0f172a;
       color: white;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid rgba(255,255,255,0.1);
-      height: 52px;
+      height: 56px;
       flex-shrink: 0;
       z-index: 20;
     }
@@ -353,61 +345,60 @@
       background: var(--ios-accent);
       border: none;
       color: white;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 20px;
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
+      gap: 8px;
     }
 
     .modal-title {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
       color: #ffffff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 40%;
-      padding: 0 8px;
+      max-width: 45%;
     }
 
     .open-ext-btn {
       background: rgba(255,255,255,0.15);
       border: none;
       color: white;
-      padding: 8px 12px;
+      padding: 8px 14px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 13px;
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-shrink: 0;
-      white-space: nowrap;
     }
 
-    /* modal-body always fills remaining space exactly, no gaps/overflow */
     .modal-body {
-      flex: 1 1 auto;
+      flex: 1;
       width: 100%;
-      min-height: 0; /* critical: lets flex child shrink properly instead of overflowing */
+      height: calc(100vh - 56px);
       background: #1e293b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       position: relative;
       overflow: hidden;
     }
 
-    /* iframe stretches to fill modal-body fully on every screen size */
+    /* Auto Match Any Screen Size */
     .modal-body iframe {
-      position: absolute;
-      top: 0; left: 0;
       width: 100%;
       height: 100%;
+      max-width: 100%;
+      max-height: 100%;
       border: none;
       display: block;
+      margin: 0 auto;
     }
 
     .iframe-loader {
@@ -673,12 +664,7 @@
       renderCandidates(filtered);
     }
 
-    // Detect mobile devices — their built-in PDF renderer ignores #view=Fit params
-    function isMobileDevice() {
-      return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    }
-
-    // 🌟 FULL VIEW SCREEN AUTO-FIT SYSTEM — now fits properly on every screen size 🌟
+    // 🌟 FULL VIEW SCREEN AUTO-FIT SYSTEM 🌟
     function openCV(pdfUrl, candidateName) {
       if (!pdfUrl || pdfUrl === '#' || pdfUrl === 'null') {
         alert("This candidate does not have a valid CV file uploaded.");
@@ -694,14 +680,8 @@
       
       loader.style.display = 'flex';
 
-      if (isMobileDevice()) {
-        // Mobile browsers' native PDF viewer doesn't respect fit/zoom URL params,
-        // so route through Google Docs Viewer which renders responsively to fill the iframe.
-        iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
-      } else {
-        // Desktop browsers (Chrome/Edge PDF viewer) respect these fit params well.
-        iframe.src = pdfUrl + "#toolbar=0&navpanes=0&view=FitH&scrollbar=1";
-      }
+      // Auto-fit to Screen Viewport via URL parameters
+      iframe.src = pdfUrl + "#toolbar=0&navpanes=0&view=Fit&scrollbar=1";
 
       modal.style.display = 'flex';
       setTimeout(() => {
