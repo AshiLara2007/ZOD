@@ -3,409 +3,461 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>CV Viewer Portal - Manpower Agency</title>
-
-  <!-- FontAwesome Icons for Old Browsers -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>ZOD Manpower CV System</title>
 
   <style>
-    /* Global Reset & Pure CSS Theme Setup */
+    /* ================= GLOBAL RESETS & FALLBACKS ================= */
     * {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    body {
-      background-color: #0f172a;
-      color: #ffffff;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
+    html, body {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      min-height: 100%;
+      width: 100%;
+      -webkit-text-size-adjust: 100%;
     }
 
-    /* Header Styling */
-    header {
+    /* ================= HEADER STYLES ================= */
+    .header-bar {
       position: -webkit-sticky;
       position: sticky;
       top: 0;
-      z-index: 30;
-      background-color: rgba(15, 23, 42, 0.95);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+      background-color: #0f172a;
+      border-bottom: 1px solid #1e293b;
       padding: 16px;
     }
-    .header-container {
-      max-width: 1024px;
+    .header-inner {
+      max-width: 1000px;
       margin: 0 auto;
     }
     .header-top {
+      display: -webkit-box;
       display: -webkit-flex;
       display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
       align-items: center;
+      -webkit-box-pack: justify;
+      -webkit-justify-content: space-between;
       justify-content: space-between;
       margin-bottom: 16px;
     }
-    .logo-area {
+    .logo-container {
+      display: -webkit-box;
       display: -webkit-flex;
       display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
       align-items: center;
-      gap: 10px;
     }
     .logo-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
       background-color: #007aff;
+      display: -webkit-box;
       display: -webkit-flex;
       display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
       align-items: center;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
       justify-content: center;
-      color: #ffffff;
-      font-size: 18px;
+      margin-right: 12px;
     }
-    .badge {
+    .title-main {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .title-sub {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .badge-count {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
       font-size: 12px;
       font-weight: 600;
       padding: 6px 12px;
-      border-radius: 9999px;
-      background-color: #1e293b;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
     }
 
-    /* Search Input */
-    .search-box {
+    /* Search Box */
+    .search-wrap {
       position: relative;
       width: 100%;
-    }
-    .search-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      -webkit-transform: translateY(-50%);
-      transform: translateY(-50%);
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 14px;
     }
     .search-input {
       width: 100%;
       background-color: #1e293b;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 10px 16px 10px 40px;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 16px 12px 42px;
       font-size: 14px;
       color: #ffffff;
       outline: none;
     }
-    .search-input:focus {
-      border-color: #007aff;
+    .search-icon-svg {
+      position: absolute;
+      left: 14px;
+      top: 12px;
+      width: 18px;
+      height: 18px;
+      fill: #94a3b8;
     }
 
-    /* Main Container & Sections */
-    main {
-      max-width: 1024px;
+    /* ================= MAIN CONTAINER ================= */
+    .main-content {
+      max-width: 1000px;
       margin: 0 auto;
-      padding: 24px 16px 64px 16px;
+      padding: 20px 16px 60px 16px;
     }
-    .section-title-wrap {
+    .section-head {
+      display: -webkit-box;
       display: -webkit-flex;
       display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
       align-items: center;
-      gap: 8px;
+      margin-top: 20px;
       margin-bottom: 12px;
     }
     .section-title {
       font-size: 12px;
-      font-weight: 600;
+      font-weight: bold;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: rgba(255, 255, 255, 0.6);
+      color: #94a3b8;
+      letter-spacing: 1px;
+      margin-right: 10px;
     }
-    .divider {
+    .section-line {
+      -webkit-box-flex: 1;
       -webkit-flex: 1;
       flex: 1;
       height: 1px;
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-    .folder-grid {
-      display: grid;
-      grid-template-columns: repeat(1, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-    @media (min-width: 640px) {
-      .folder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (min-width: 1024px) {
-      .folder-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      background-color: #1e293b;
     }
 
-    /* Folder Card Styling */
+    /* Grid Layout without CSS `gap` property for Old iOS */
+    .folder-grid {
+      width: 100%;
+      font-size: 0; /* Remove inline-block spaces */
+    }
+    .folder-card-wrap {
+      display: inline-block;
+      vertical-align: top;
+      width: 100%;
+      padding-bottom: 12px;
+      font-size: 14px;
+    }
+    @media (min-width: 600px) {
+      .folder-card-wrap {
+        width: 50%;
+        padding-right: 6px;
+      }
+      .folder-card-wrap:nth-child(even) {
+        padding-right: 0;
+        padding-left: 6px;
+      }
+    }
+    @media (min-width: 900px) {
+      .folder-card-wrap {
+        width: 33.333%;
+        padding-right: 8px;
+        padding-left: 0;
+      }
+      .folder-card-wrap:nth-child(even) {
+        padding-right: 8px;
+        padding-left: 0;
+      }
+    }
+
     .folder-card {
       background-color: #1e293b;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 16px;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      display: -webkit-box;
       display: -webkit-flex;
       display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
       align-items: center;
+      -webkit-box-pack: justify;
+      -webkit-justify-content: space-between;
       justify-content: space-between;
-      cursor: pointer;
-      text-align: left;
       width: 100%;
-      color: #ffffff;
+      text-align: left;
+      cursor: pointer;
     }
-    .folder-card:hover, .folder-card:active {
-      background-color: #29394d;
-      border-color: rgba(0, 122, 255, 0.4);
+    .folder-card:active {
+      background-color: #334155;
     }
-    .folder-left {
+    .card-left {
+      display: -webkit-box;
       display: -webkit-flex;
       display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
       align-items: center;
-      gap: 12px;
       overflow: hidden;
     }
-    .folder-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background-color: rgba(0, 122, 255, 0.15);
-      color: #007aff;
+    .folder-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: rgba(0, 122, 255, 0.2);
+      display: -webkit-box;
       display: -webkit-flex;
       display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
       align-items: center;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
       justify-content: center;
-      font-size: 18px;
+      margin-right: 12px;
       -webkit-shrink: 0;
       flex-shrink: 0;
     }
-    .folder-text h3 {
-      font-size: 14px;
+    .folder-avatar svg {
+      width: 20px;
+      height: 20px;
+      fill: #007aff;
+    }
+    .card-title {
+      color: #ffffff;
       font-weight: 600;
+      font-size: 14px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .folder-text p {
+    .card-sub {
+      color: #94a3b8;
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
       margin-top: 2px;
     }
-    .count-badge {
+    .num-pill {
       background-color: #007aff;
       color: #ffffff;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: bold;
       padding: 4px 10px;
-      border-radius: 9999px;
-      margin-right: 8px;
+      border-radius: 12px;
     }
 
-    /* CV Viewer Modal Overlay */
+    /* ================= MODAL VIEWER ================= */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 50;
+      z-index: 1000;
       background-color: #0f172a;
       display: none;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
       -webkit-flex-direction: column;
       flex-direction: column;
     }
-    .modal-header {
+    .modal-nav {
       height: 56px;
       background-color: #1e293b;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid #334155;
       padding: 0 16px;
+      display: -webkit-box;
       display: -webkit-flex;
       display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
       align-items: center;
+      -webkit-box-pack: justify;
+      -webkit-justify-content: space-between;
       justify-content: space-between;
-      -webkit-shrink: 0;
-      flex-shrink: 0;
     }
-    .back-btn {
-      background-color: rgba(255, 255, 255, 0.1);
+    .btn-back {
+      background-color: #334155;
       color: #ffffff;
       border: none;
-      padding: 6px 12px;
+      padding: 8px 14px;
       border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
     }
+    .modal-title {
+      font-weight: bold;
+      font-size: 15px;
+      color: #ffffff;
+    }
 
-    /* Horizontal Side-Scroll Gallery */
-    .slides-viewport {
+    /* Gallery Slider */
+    .gallery-container {
+      -webkit-box-flex: 1;
       -webkit-flex: 1;
       flex: 1;
       overflow-x: auto;
       overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       padding: 16px;
-      display: -webkit-flex;
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      scroll-snap-type: x mandatory;
-      -webkit-scroll-snap-type: mandatory;
+      white-space: nowrap;
+      font-size: 0;
     }
-    .cv-slide {
-      -webkit-shrink: 0;
-      flex-shrink: 0;
-      width: 85vw;
-      max-width: 650px;
+    .cv-slide-box {
+      display: inline-block;
+      vertical-align: middle;
+      width: 85%;
+      max-width: 600px;
       height: 100%;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-flex-direction: column;
-      flex-direction: column;
-      scroll-snap-align: center;
-      -webkit-scroll-snap-align: center;
+      margin-right: 16px;
+      white-space: normal;
+      font-size: 14px;
     }
-    .cv-frame {
+    .cv-image-frame {
       position: relative;
-      -webkit-flex: 1;
-      flex: 1;
+      width: 100%;
+      height: calc(100% - 45px);
       background-color: #000000;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      border: 1px solid #334155;
       overflow: hidden;
-      display: -webkit-flex;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      text-align: center;
     }
-    .cv-frame img {
+    .cv-image-frame img {
       max-width: 100%;
       max-height: 100%;
-      width: auto;
-      height: auto;
-      object-fit: contain;
+      position: absolute;
+      top: 0; bottom: 0; left: 0; right: 0;
+      margin: auto;
     }
-    .counter-tag {
+    .tag-counter {
       position: absolute;
       top: 10px; right: 10px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
+      background: rgba(0,0,0,0.8);
+      color: #ffffff;
       font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 9999px;
+      padding: 4px 8px;
+      border-radius: 10px;
     }
-    .open-btn {
+    .btn-open-link {
       position: absolute;
       top: 10px; left: 10px;
       background: #007aff;
-      color: #fff;
-      font-size: 12px;
-      padding: 6px 12px;
-      border-radius: 9999px;
+      color: #ffffff;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 10px;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: bold;
     }
 
-    /* Helper Utilities */
+    /* Utility */
     .hidden { display: none !important; }
-    .flex { display: -webkit-flex !important; display: flex !important; }
-    .center-box { text-align: center; padding: 60px 16px; color: rgba(255, 255, 255, 0.5); }
+    .status-msg { text-align: center; padding: 50px 16px; color: #94a3b8; font-size: 14px; }
   </style>
 </head>
 <body>
 
   <!-- ================= HEADER ================= -->
-  <header>
-    <div class="header-container">
+  <div class="header-bar">
+    <div class="header-inner">
       <div class="header-top">
-        <div class="logo-area">
+        <div class="logo-container">
           <div class="logo-icon">
-            <i class="fa-solid fa-folder-open"></i>
+            <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
           </div>
           <div>
-            <h1 style="font-size: 18px; font-weight: 700;">CV Viewer Portal</h1>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.5);">Manpower Agency</p>
+            <div class="title-main">ZOD Manpower CV System</div>
+            <div class="title-sub">Candidate CV Viewer Portal</div>
           </div>
         </div>
-        <span id="totalBadge" class="badge hidden">
-          <span id="totalCount">0</span> Total CVs
-        </span>
+        <div id="totalBadge" class="badge-count hidden">
+          <span id="totalCount">0</span> CVs
+        </div>
       </div>
 
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <div class="search-wrap">
+        <svg class="search-icon-svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
         <input
           type="text"
           id="searchInput"
-          onkeyup="handleSearch()"
-          oninput="handleSearch()"
+          onkeyup="filterFolders()"
+          oninput="filterFolders()"
           placeholder="Search folders (role, country, type)..."
           class="search-input"
         />
       </div>
     </div>
-  </header>
+  </div>
 
-  <!-- ================= MAIN CONTENT ================= -->
-  <main>
-    <div id="loadingState" class="center-box">
-      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; color: #007aff; margin-bottom: 8px;"></i>
-      <p>Loading Candidates & CVs...</p>
+  <!-- ================= MAIN BODY ================= -->
+  <div class="main-content">
+    <div id="loadingState" class="status-msg">
+      Loading Candidates & Data...
     </div>
 
-    <div id="errorState" class="center-box hidden" style="color: #f87171;">
-      <p id="errorText">Failed to load data from server.</p>
+    <div id="errorState" class="status-msg hidden" style="color: #f87171;">
+      <span id="errorText">Error loading data.</span>
     </div>
 
-    <div id="emptyState" class="center-box hidden">
-      <p id="emptyText">No folders found matching your search.</p>
+    <div id="emptyState" class="status-msg hidden">
+      No folders match your search query.
     </div>
 
     <div id="sectionsContainer" class="hidden">
       <!-- Housemaid Types -->
       <div id="sec-housemaid">
-        <div class="section-title-wrap">
+        <div class="section-head">
           <span class="section-title">Housemaid Types</span>
-          <div class="divider"></div>
+          <div class="section-line"></div>
         </div>
         <div id="grid-housemaid" class="folder-grid"></div>
       </div>
 
       <!-- Job Roles -->
       <div id="sec-jobs">
-        <div class="section-title-wrap">
+        <div class="section-head">
           <span class="section-title">Job Roles</span>
-          <div class="divider"></div>
+          <div class="section-line"></div>
         </div>
         <div id="grid-jobs" class="folder-grid"></div>
       </div>
 
       <!-- Countries -->
       <div id="sec-countries">
-        <div class="section-title-wrap">
+        <div class="section-head">
           <span class="section-title">Countries</span>
-          <div class="divider"></div>
+          <div class="section-line"></div>
         </div>
         <div id="grid-countries" class="folder-grid"></div>
       </div>
     </div>
-  </main>
+  </div>
 
   <!-- ================= CV VIEWER MODAL ================= -->
-  <div id="cvViewerModal" class="modal-overlay">
-    <div class="modal-header">
-      <button onclick="closeCVViewer()" class="back-btn">
-        <i class="fa-solid fa-arrow-left"></i> Back
-      </button>
-      <div style="text-align: center;">
-        <span id="viewerTitle" style="font-weight: 600; font-size: 15px; display: block;"></span>
-      </div>
-      <span id="viewerBadge" class="count-badge">0 CVs</span>
+  <div id="cvModal" class="modal-overlay">
+    <div class="modal-nav">
+      <button onclick="closeModal()" class="btn-back">← Back</button>
+      <div id="modalTitle" class="modal-title"></div>
+      <div id="modalBadge" class="num-pill">0</div>
     </div>
 
-    <div id="viewerSlidesContainer" class="slides-viewport">
-      <!-- CV Slides injected via JS -->
+    <div id="slidesViewport" class="gallery-container">
+      <!-- Slides loaded here -->
     </div>
   </div>
 
-  <!-- ================= OLD IPAD COMPATIBLE JS ================= -->
+  <!-- ================= JAVASCRIPT FOR OLD IPAD ================= -->
   <script>
     var SUPABASE_URL = "https://ksyxmoqzcghszrhlpaxh.supabase.co"; 
     var SUPABASE_KEY = "sb_publishable_U289_qf4pkGHp-G1C4kX5w_2bztcmOg";
@@ -419,10 +471,13 @@
       "Nurse": "Nurse"
     };
 
+    var SVG_FOLDER = '<svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>';
+    var SVG_BRIEFCASE = '<svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>';
+    var SVG_GLOBE = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>';
+
     var talents = [];
 
-    // Old iPad Compatible XMLHttpRequest (No Fetch API Dependency)
-    function loadData() {
+    function initData() {
       var xhr = new XMLHttpRequest();
       xhr.open("GET", SUPABASE_URL + "/rest/v1/talents?select=*&order=created_at.desc", true);
       xhr.setRequestHeader("apikey", SUPABASE_KEY);
@@ -434,190 +489,180 @@
             talents = JSON.parse(xhr.responseText);
             document.getElementById("loadingState").className += " hidden";
             document.getElementById("totalCount").innerText = talents.length;
-            document.getElementById("totalBadge").className = "badge";
+            document.getElementById("totalBadge").className = "badge-count";
             document.getElementById("sectionsContainer").className = "";
-            renderFolders();
+            filterFolders();
           } catch(e) {
-            showErr("Data parsing error: " + e.message);
+            showError("JSON Error: " + e.message);
           }
         } else {
-          showErr("Database Connection Error (Code: " + xhr.status + ")");
+          showError("HTTP Error " + xhr.status);
         }
       };
 
       xhr.onerror = function() {
-        showErr("Network Error. Please check your internet connection.");
+        showError("Network connection failed.");
       };
 
       xhr.send();
     }
 
-    function showErr(msg) {
+    function showError(msg) {
       document.getElementById("loadingState").className += " hidden";
       document.getElementById("errorText").innerText = msg;
-      document.getElementById("errorState").className = "center-box";
+      document.getElementById("errorState").className = "status-msg";
     }
 
-    function getUnique(arr, key) {
-      var map = {}, out = [];
-      for (var i = 0; i < arr.length; i++) {
-        var val = arr[i][key];
-        if (val && !map[val]) {
-          map[val] = true;
-          out.push(val);
+    function getUniqueKeys(arr, key) {
+      var map = {}, list = [];
+      for(var i = 0; i < arr.length; i++) {
+        var v = arr[i][key];
+        if(v && !map[v]) {
+          map[v] = true;
+          list.push(v);
         }
       }
-      return out.sort();
+      return list.sort();
     }
 
-    function buildData() {
+    function filterFolders() {
+      var q = document.getElementById("searchInput").value.toLowerCase().trim();
+
       var housemaids = [
         {
           label: "Recruitment Housemaids",
-          icon: "fa-users",
+          icon: SVG_FOLDER,
           talents: talents.filter(function(t) { return t.workerType === "Recruitment Workers"; })
         },
         {
           label: "Returned Housemaids",
-          icon: "fa-users",
+          icon: SVG_FOLDER,
           talents: talents.filter(function(t) { return t.workerType === "Returned Housemaids"; })
         }
       ];
 
-      var jobs = getUnique(talents, 'job').map(function(j) {
+      var jobs = getUniqueKeys(talents, 'job').map(function(j) {
         return {
           label: JOB_LABELS[j] || j,
-          icon: "fa-briefcase",
+          icon: SVG_BRIEFCASE,
           talents: talents.filter(function(t) { return t.job === j; })
         };
       });
 
-      var countries = getUnique(talents, 'country').map(function(c) {
+      var countries = getUniqueKeys(talents, 'country').map(function(c) {
         return {
           label: c,
-          icon: "fa-globe",
+          icon: SVG_GLOBE,
           talents: talents.filter(function(t) { return t.country === c; })
         };
       });
 
-      return [
-        { id: "housemaid", folders: housemaids },
-        { id: "jobs", folders: jobs },
-        { id: "countries", folders: countries }
+      var sections = [
+        { id: "housemaid", data: housemaids },
+        { id: "jobs", data: jobs },
+        { id: "countries", data: countries }
       ];
-    }
 
-    function renderFolders() {
-      var q = document.getElementById("searchInput").value.toLowerCase().trim();
-      var sections = buildData();
-      var visibleTotal = 0;
+      var totalFound = 0;
 
-      for (var i = 0; i < sections.length; i++) {
-        var sec = sections[i];
+      for (var s = 0; s < sections.length; s++) {
+        var sec = sections[s];
         var grid = document.getElementById("grid-" + sec.id);
         var secDiv = document.getElementById("sec-" + sec.id);
         grid.innerHTML = "";
 
-        var matches = sec.folders.filter(function(f) {
-          return f.label.toLowerCase().indexOf(q) !== -1;
+        var matches = sec.data.filter(function(item) {
+          return item.label.toLowerCase().indexOf(q) !== -1;
         });
 
         if (matches.length > 0) {
           secDiv.className = "";
-          visibleTotal += matches.length;
+          totalFound += matches.length;
 
-          for (var j = 0; j < matches.length; j++) {
-            var f = matches[j];
-            var btn = document.createElement("button");
-            btn.className = "folder-card";
-            btn.onclick = (function(folderData) {
-              return function() { openCVViewer(folderData); };
-            })(f);
+          for (var k = 0; k < matches.length; k++) {
+            var item = matches[k];
+            var wrap = document.createElement("div");
+            wrap.className = "folder-card-wrap";
 
-            btn.innerHTML = 
-              '<div class="folder-left">' +
-                '<div class="folder-icon"><i class="fa-solid ' + f.icon + '"></i></div>' +
-                '<div class="folder-text">' +
-                  '<h3>' + f.label + '</h3>' +
-                  '<p>' + f.talents.length + ' CVs available</p>' +
+            var card = document.createElement("div");
+            card.className = "folder-card";
+            card.onclick = (function(folderObj) {
+              return function() { openModal(folderObj); };
+            })(item);
+
+            card.innerHTML = 
+              '<div class="card-left">' +
+                '<div class="folder-avatar">' + item.icon + '</div>' +
+                '<div>' +
+                  '<div class="card-title">' + item.label + '</div>' +
+                  '<div class="card-sub">' + item.talents.length + ' CVs Available</div>' +
                 '</div>' +
               '</div>' +
-              '<div style="display:-webkit-flex; display:flex; align-items:center;">' +
-                '<span class="count-badge">' + f.talents.length + '</span>' +
-                '<i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.4;"></i>' +
-              '</div>';
+              '<div class="num-pill">' + item.talents.length + '</div>';
 
-            grid.appendChild(btn);
+            wrap.appendChild(card);
+            grid.appendChild(wrap);
           }
         } else {
           secDiv.className = "hidden";
         }
       }
 
-      var emptyState = document.getElementById("emptyState");
-      if (visibleTotal === 0 && q !== "") {
-        emptyState.className = "center-box";
+      var empty = document.getElementById("emptyState");
+      if (totalFound === 0 && q !== "") {
+        empty.className = "status-msg";
       } else {
-        emptyState.className = "center-box hidden";
+        empty.className = "status-msg hidden";
       }
     }
 
-    function handleSearch() {
-      renderFolders();
-    }
-
-    function openCVViewer(folder) {
-      document.getElementById("viewerTitle").innerText = folder.label;
-      document.getElementById("viewerBadge").innerText = folder.talents.length + " CVs";
-      var container = document.getElementById("viewerSlidesContainer");
-      container.innerHTML = "";
+    function openModal(folder) {
+      document.getElementById("modalTitle").innerText = folder.label;
+      document.getElementById("modalBadge").innerText = folder.talents.length + " CVs";
+      var vp = document.getElementById("slidesViewport");
+      vp.innerHTML = "";
 
       if (folder.talents.length === 0) {
-        container.innerHTML = '<div class="center-box" style="width:100%;">No CVs in this folder.</div>';
+        vp.innerHTML = '<div class="status-msg">No CVs in this folder</div>';
       } else {
         for (var i = 0; i < folder.talents.length; i++) {
-          var t = folder.talents[i];
+          var c = folder.talents[i];
           var slide = document.createElement("div");
-          slide.className = "cv-slide";
+          slide.className = "cv-slide-box";
 
-          var imgHtml = t.cv 
-            ? '<img src="' + t.cv + '" alt="CV" />' 
-            : '<div style="color:rgba(255,255,255,0.4); font-size:12px;">No CV Image Available</div>';
+          var img = c.cv 
+            ? '<img src="' + c.cv + '" alt="CV" />' 
+            : '<div style="color:#94a3b8; padding-top:100px;">No CV Image</div>';
 
-          var openBtn = t.cv 
-            ? '<a href="' + t.cv + '" target="_blank" class="open-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Original</a>' 
+          var link = c.cv 
+            ? '<a href="' + c.cv + '" target="_blank" class="btn-open-link">Open Original</a>' 
             : '';
 
           slide.innerHTML = 
-            '<div class="cv-frame">' +
-              imgHtml +
-              '<span class="counter-tag">' + (i + 1) + ' / ' + folder.talents.length + '</span>' +
-              openBtn +
+            '<div class="cv-image-frame">' +
+              img +
+              '<span class="tag-counter">' + (i + 1) + ' / ' + folder.talents.length + '</span>' +
+              link +
             '</div>' +
-            '<div style="margin-top: 10px;">' +
-              '<p style="font-weight: 600; font-size: 14px;">' + (t.name || 'Unnamed Candidate') + '</p>' +
-              '<p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top:2px;">' +
-                (t.job || 'N/A') + ' • ' + (t.experience || 'N/A') + ' • ' + (t.country || 'N/A') +
-              '</p>' +
+            '<div style="margin-top:8px;">' +
+              '<div style="color:#ffffff; font-weight:bold;">' + (c.name || 'Unnamed Candidate') + '</div>' +
+              '<div style="color:#94a3b8; font-size:12px;">' + (c.job || 'N/A') + ' • ' + (c.experience || 'N/A') + ' • ' + (c.country || 'N/A') + '</div>' +
             '</div>';
 
-          container.appendChild(slide);
+          vp.appendChild(slide);
         }
       }
 
-      var modal = document.getElementById("cvViewerModal");
+      var modal = document.getElementById("cvModal");
       modal.style.display = "-webkit-flex";
       modal.style.display = "flex";
-      document.body.style.overflow = "hidden";
     }
 
-    function closeCVViewer() {
-      var modal = document.getElementById("cvViewerModal");
-      modal.style.display = "none";
-      document.body.style.overflow = "auto";
+    function closeModal() {
+      document.getElementById("cvModal").style.display = "none";
     }
 
-    window.onload = loadData;
+    window.onload = initData;
   </script>
 </body>
 </html>
