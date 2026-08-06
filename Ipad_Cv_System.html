@@ -1,177 +1,411 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#0f172a]">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>CV Viewer Portal - Manpower Agency</title>
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- FontAwesome Icons -->
+  <!-- FontAwesome Icons for Old Browsers -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Babel Standalone (Old Browser ES6 to ES5 Converter) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
-
   <style>
-    /* Custom Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    /* Global Reset & Pure CSS Theme Setup */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    ::-webkit-scrollbar-track {
-      background: #0f172a;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
+    body {
+      background-color: #0f172a;
+      color: #ffffff;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Old iOS Safari Scroll Fixes */
-    .snap-gallery {
-      -webkit-overflow-scrolling: touch !important;
+    /* Header Styling */
+    header {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background-color: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px;
+    }
+    .header-container {
+      max-width: 1024px;
+      margin: 0 auto;
+    }
+    .header-top {
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .logo-area {
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background-color: #007aff;
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 18px;
+    }
+    .badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      background-color: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Search Input */
+    .search-box {
+      position: relative;
+      width: 100%;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 14px;
+    }
+    .search-input {
+      width: 100%;
+      background-color: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 16px 10px 40px;
+      font-size: 14px;
+      color: #ffffff;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: #007aff;
+    }
+
+    /* Main Container & Sections */
+    main {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 24px 16px 64px 16px;
+    }
+    .section-title-wrap {
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .divider {
+      -webkit-flex: 1;
+      flex: 1;
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    @media (min-width: 640px) {
+      .folder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) {
+      .folder-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    /* Folder Card Styling */
+    .folder-card {
+      background-color: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      color: #ffffff;
+    }
+    .folder-card:hover, .folder-card:active {
+      background-color: #29394d;
+      border-color: rgba(0, 122, 255, 0.4);
+    }
+    .folder-left {
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+    .folder-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background-color: rgba(0, 122, 255, 0.15);
+      color: #007aff;
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      -webkit-shrink: 0;
+      flex-shrink: 0;
+    }
+    .folder-text h3 {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .folder-text p {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 2px;
+    }
+    .count-badge {
+      background-color: #007aff;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      margin-right: 8px;
+    }
+
+    /* CV Viewer Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 50;
+      background-color: #0f172a;
+      display: none;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+    }
+    .modal-header {
+      height: 56px;
+      background-color: #1e293b;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0 16px;
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      -webkit-shrink: 0;
+      flex-shrink: 0;
+    }
+    .back-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Horizontal Side-Scroll Gallery */
+    .slides-viewport {
+      -webkit-flex: 1;
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px;
+      display: -webkit-flex;
+      display: flex;
+      gap: 16px;
+      align-items: center;
       scroll-snap-type: x mandatory;
       -webkit-scroll-snap-type: mandatory;
-      -ms-scroll-snap-type: mandatory;
     }
-    .snap-slide {
+    .cv-slide {
+      -webkit-shrink: 0;
+      flex-shrink: 0;
+      width: 85vw;
+      max-width: 650px;
+      height: 100%;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
       scroll-snap-align: center;
       -webkit-scroll-snap-align: center;
     }
-    
-    /* Cross-browser Image Contain */
-    .cv-image-contain {
+    .cv-frame {
+      position: relative;
+      -webkit-flex: 1;
+      flex: 1;
+      background-color: #000000;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cv-frame img {
       max-width: 100%;
       max-height: 100%;
       width: auto;
       height: auto;
       object-fit: contain;
-      -o-object-fit: contain;
     }
+    .counter-tag {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+    .open-btn {
+      position: absolute;
+      top: 10px; left: 10px;
+      background: #007aff;
+      color: #fff;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Helper Utilities */
+    .hidden { display: none !important; }
+    .flex { display: -webkit-flex !important; display: flex !important; }
+    .center-box { text-align: center; padding: 60px 16px; color: rgba(255, 255, 255, 0.5); }
   </style>
 </head>
-<body class="bg-[#0f172a] text-white min-h-screen font-sans antialiased selection:bg-[#007aff] selection:text-white">
+<body>
 
-  <!-- ================= HEADER SECTION ================= -->
-  <header class="sticky top-0 z-30 bg-[#0f172a]/90 backdrop-blur-lg border-b border-white/10">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4">
-      <div class="flex items-center justify-between gap-4 mb-4">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-[#007aff] flex items-center justify-center shrink-0 shadow-lg shadow-[#007aff]/20">
-            <i class="fa-regular fa-folder-open text-white text-base"></i>
+  <!-- ================= HEADER ================= -->
+  <header>
+    <div class="header-container">
+      <div class="header-top">
+        <div class="logo-area">
+          <div class="logo-icon">
+            <i class="fa-solid fa-folder-open"></i>
           </div>
           <div>
-            <h1 class="text-lg font-bold leading-tight">CV Viewer Portal</h1>
-            <p class="text-white/50 text-xs">Manpower Agency</p>
+            <h1 style="font-size: 18px; font-weight: 700;">CV Viewer Portal</h1>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.5);">Manpower Agency</p>
           </div>
         </div>
-        
-        <span id="totalBadge" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#1e293b] border border-white/10 text-white/80 hidden">
+        <span id="totalBadge" class="badge hidden">
           <span id="totalCount">0</span> Total CVs
         </span>
       </div>
 
-      <!-- Search Box -->
-      <div class="relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 text-sm"></i>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input
           type="text"
           id="searchInput"
-          oninput="handleSearch()"
           onkeyup="handleSearch()"
-          placeholder="Search folders (role, country, type)…"
-          class="w-full bg-[#1e293b] border border-white/10 focus:border-[#007aff] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-white/40 outline-none transition-colors"
+          oninput="handleSearch()"
+          placeholder="Search folders (role, country, type)..."
+          class="search-input"
         />
       </div>
     </div>
   </header>
 
-  <!-- ================= MAIN CONTENT BODY ================= -->
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-16">
-    
-    <!-- Loading Spinner -->
-    <div id="loadingState" class="flex flex-col items-center justify-center py-24 text-white/50">
-      <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-3 text-[#007aff]"></i>
-      <p class="text-sm">Loading CVs…</p>
+  <!-- ================= MAIN CONTENT ================= -->
+  <main>
+    <div id="loadingState" class="center-box">
+      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; color: #007aff; margin-bottom: 8px;"></i>
+      <p>Loading Candidates & CVs...</p>
     </div>
 
-    <!-- Error State -->
-    <div id="errorState" class="hidden flex flex-col items-center justify-center py-24 text-center">
-      <p class="text-red-400 text-sm font-medium mb-1">Something went wrong</p>
-      <p id="errorText" class="text-white/50 text-xs"></p>
+    <div id="errorState" class="center-box hidden" style="color: #f87171;">
+      <p id="errorText">Failed to load data from server.</p>
     </div>
 
-    <!-- Empty Search State -->
-    <div id="emptyState" class="hidden flex flex-col items-center justify-center py-24 text-white/50">
-      <p id="emptyText" class="text-sm">No folders match your search.</p>
+    <div id="emptyState" class="center-box hidden">
+      <p id="emptyText">No folders found matching your search.</p>
     </div>
 
-    <!-- Folders Sections Container -->
-    <div id="sectionsContainer" class="space-y-8 hidden">
+    <div id="sectionsContainer" class="hidden">
       <!-- Housemaid Types -->
-      <section id="sec-housemaid">
-        <div class="flex items-center gap-2 mb-3">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-white/60">Housemaid Types</h2>
-          <div class="flex-1 h-px bg-white/10"></div>
+      <div id="sec-housemaid">
+        <div class="section-title-wrap">
+          <span class="section-title">Housemaid Types</span>
+          <div class="divider"></div>
         </div>
-        <div id="grid-housemaid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-      </section>
+        <div id="grid-housemaid" class="folder-grid"></div>
+      </div>
 
       <!-- Job Roles -->
-      <section id="sec-jobs">
-        <div class="flex items-center gap-2 mb-3">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-white/60">Job Roles</h2>
-          <div class="flex-1 h-px bg-white/10"></div>
+      <div id="sec-jobs">
+        <div class="section-title-wrap">
+          <span class="section-title">Job Roles</span>
+          <div class="divider"></div>
         </div>
-        <div id="grid-jobs" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-      </section>
+        <div id="grid-jobs" class="folder-grid"></div>
+      </div>
 
       <!-- Countries -->
-      <section id="sec-countries">
-        <div class="flex items-center gap-2 mb-3">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-white/60">Countries</h2>
-          <div class="flex-1 h-px bg-white/10"></div>
+      <div id="sec-countries">
+        <div class="section-title-wrap">
+          <span class="section-title">Countries</span>
+          <div class="divider"></div>
         </div>
-        <div id="grid-countries" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-      </section>
+        <div id="grid-countries" class="folder-grid"></div>
+      </div>
     </div>
-
   </main>
 
-  <!-- ================= CV VIEWER OVERLAY MODAL ================= -->
-  <div id="cvViewerModal" class="fixed inset-0 z-50 bg-[#0f172a] hidden flex-col">
-    <!-- Top Bar -->
-    <div class="flex items-center gap-3 px-3 sm:px-4 h-14 border-b border-white/10 bg-[#1e293b] shrink-0">
-      <button
-        onclick="closeCVViewer()"
-        class="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
-      >
-        <i class="fa-solid fa-arrow-left text-base"></i>
-        <span class="hidden sm:inline">Back to Folders</span>
+  <!-- ================= CV VIEWER MODAL ================= -->
+  <div id="cvViewerModal" class="modal-overlay">
+    <div class="modal-header">
+      <button onclick="closeCVViewer()" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back
       </button>
-
-      <div class="flex-1 min-w-0 text-center">
-        <span id="viewerTitle" class="text-white font-semibold text-sm sm:text-base truncate block"></span>
+      <div style="text-align: center;">
+        <span id="viewerTitle" style="font-weight: 600; font-size: 15px; display: block;"></span>
       </div>
-
-      <span id="viewerBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-[#007aff] text-white shrink-0">
-        0 CVs
-      </span>
+      <span id="viewerBadge" class="count-badge">0 CVs</span>
     </div>
 
-    <!-- Horizontal Side-Scroll Gallery -->
-    <div class="flex-1 overflow-x-auto overflow-y-hidden snap-gallery">
-      <div id="viewerSlidesContainer" class="flex gap-3 sm:gap-5 p-3 sm:p-5 h-full">
-        <!-- Candidate CV slides injected dynamically here -->
-      </div>
+    <div id="viewerSlidesContainer" class="slides-viewport">
+      <!-- CV Slides injected via JS -->
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT CODE ================= -->
+  <!-- ================= OLD IPAD COMPATIBLE JS ================= -->
   <script>
     var SUPABASE_URL = "https://ksyxmoqzcghszrhlpaxh.supabase.co"; 
     var SUPABASE_KEY = "sb_publishable_U289_qf4pkGHp-G1C4kX5w_2bztcmOg";
@@ -186,89 +420,80 @@
     };
 
     var talents = [];
-    var activeFolder = null;
 
-    // Backward compatible AJAX Request for older iOS Browsers
-    function fetchTalentsData() {
+    // Old iPad Compatible XMLHttpRequest (No Fetch API Dependency)
+    function loadData() {
       var xhr = new XMLHttpRequest();
       xhr.open("GET", SUPABASE_URL + "/rest/v1/talents?select=*&order=created_at.desc", true);
       xhr.setRequestHeader("apikey", SUPABASE_KEY);
       xhr.setRequestHeader("Authorization", "Bearer " + SUPABASE_KEY);
-      xhr.setRequestHeader("Content-Type", "application/json");
 
-      xhr.onload = function () {
+      xhr.onload = function() {
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             talents = JSON.parse(xhr.responseText);
-            document.getElementById('loadingState').className += ' hidden';
-            document.getElementById('totalCount').innerText = talents.length;
-            document.getElementById('totalBadge').className = document.getElementById('totalBadge').className.replace('hidden', '');
-            document.getElementById('sectionsContainer').className = document.getElementById('sectionsContainer').className.replace('hidden', '');
-            renderUI();
-          } catch (e) {
-            showError("JSON Parse Error: " + e.message);
+            document.getElementById("loadingState").className += " hidden";
+            document.getElementById("totalCount").innerText = talents.length;
+            document.getElementById("totalBadge").className = "badge";
+            document.getElementById("sectionsContainer").className = "";
+            renderFolders();
+          } catch(e) {
+            showErr("Data parsing error: " + e.message);
           }
         } else {
-          showError("HTTP error: " + xhr.status);
+          showErr("Database Connection Error (Code: " + xhr.status + ")");
         }
       };
 
-      xhr.onerror = function () {
-        showError("Network connection error.");
+      xhr.onerror = function() {
+        showErr("Network Error. Please check your internet connection.");
       };
 
       xhr.send();
     }
 
-    function showError(msg) {
-      document.getElementById('loadingState').className += ' hidden';
-      document.getElementById('errorText').innerText = msg;
-      document.getElementById('errorState').className = document.getElementById('errorState').className.replace('hidden', '');
+    function showErr(msg) {
+      document.getElementById("loadingState").className += " hidden";
+      document.getElementById("errorText").innerText = msg;
+      document.getElementById("errorState").className = "center-box";
     }
 
-    // Helper to get Unique Values safely for old JS engines
-    function getUniqueValues(arr, key) {
-      var flags = [], output = [], l = arr.length, i;
-      for(i=0; i<l; i++) {
-        if (arr[i][key]) {
-          if(flags[arr[i][key]]) continue;
-          flags[arr[i][key]] = true;
-          output.push(arr[i][key]);
+    function getUnique(arr, key) {
+      var map = {}, out = [];
+      for (var i = 0; i < arr.length; i++) {
+        var val = arr[i][key];
+        if (val && !map[val]) {
+          map[val] = true;
+          out.push(val);
         }
       }
-      return output.sort();
+      return out.sort();
     }
 
-    function getSections() {
-      var housemaidTypes = [
+    function buildData() {
+      var housemaids = [
         {
-          id: "recruitment",
           label: "Recruitment Housemaids",
           icon: "fa-users",
           talents: talents.filter(function(t) { return t.workerType === "Recruitment Workers"; })
         },
         {
-          id: "returned",
           label: "Returned Housemaids",
           icon: "fa-users",
           talents: talents.filter(function(t) { return t.workerType === "Returned Housemaids"; })
         }
       ];
 
-      var jobs = getUniqueValues(talents, 'job');
-      var jobRoles = jobs.map(function(j) {
+      var jobs = getUnique(talents, 'job').map(function(j) {
         return {
-          id: 'job-' + j,
           label: JOB_LABELS[j] || j,
           icon: "fa-briefcase",
           talents: talents.filter(function(t) { return t.job === j; })
         };
       });
 
-      var countries = getUniqueValues(talents, 'country');
-      var countryFolders = countries.map(function(c) {
+      var countries = getUnique(talents, 'country').map(function(c) {
         return {
-          id: 'country-' + c,
           label: c,
           icon: "fa-globe",
           talents: talents.filter(function(t) { return t.country === c; })
@@ -276,142 +501,123 @@
       });
 
       return [
-        { id: "housemaid", title: "Housemaid Types", folders: housemaidTypes },
-        { id: "jobs", title: "Job Roles", folders: jobRoles },
-        { id: "countries", title: "Countries", folders: countryFolders }
+        { id: "housemaid", folders: housemaids },
+        { id: "jobs", folders: jobs },
+        { id: "countries", folders: countries }
       ];
     }
 
-    function renderUI() {
-      var query = document.getElementById('searchInput').value.toLowerCase().trim();
-      var sections = getSections();
-      var totalVisibleFolders = 0;
+    function renderFolders() {
+      var q = document.getElementById("searchInput").value.toLowerCase().trim();
+      var sections = buildData();
+      var visibleTotal = 0;
 
-      sections.forEach(function(sec) {
-        var gridEl = document.getElementById('grid-' + sec.id);
-        var secEl = document.getElementById('sec-' + sec.id);
-        gridEl.innerHTML = "";
+      for (var i = 0; i < sections.length; i++) {
+        var sec = sections[i];
+        var grid = document.getElementById("grid-" + sec.id);
+        var secDiv = document.getElementById("sec-" + sec.id);
+        grid.innerHTML = "";
 
-        var filteredFolders = sec.folders.filter(function(f) {
-          return f.label.toLowerCase().indexOf(query) !== -1;
+        var matches = sec.folders.filter(function(f) {
+          return f.label.toLowerCase().indexOf(q) !== -1;
         });
 
-        if (filteredFolders.length > 0) {
-          secEl.className = secEl.className.replace('hidden', '');
-          totalVisibleFolders += filteredFolders.length;
+        if (matches.length > 0) {
+          secDiv.className = "";
+          visibleTotal += matches.length;
 
-          filteredFolders.forEach(function(folder) {
-            var count = folder.talents.length;
-            var cardBtn = document.createElement('button');
-            cardBtn.className = "group relative flex items-center gap-3 p-4 rounded-2xl bg-[#1e293b] hover:bg-[#29394d] border border-white/5 hover:border-[#007aff]/40 transition-all duration-200 text-left active:scale-[0.98]";
-            
-            cardBtn.onclick = function() { openCVViewer(folder); };
+          for (var j = 0; j < matches.length; j++) {
+            var f = matches[j];
+            var btn = document.createElement("button");
+            btn.className = "folder-card";
+            btn.onclick = (function(folderData) {
+              return function() { openCVViewer(folderData); };
+            })(f);
 
-            cardBtn.innerHTML = 
-              '<div class="flex items-center justify-center w-11 h-11 rounded-xl bg-[#007aff]/15 text-[#007aff] shrink-0 group-hover:bg-[#007aff]/25 transition-colors">' +
-                '<i class="fa-solid ' + folder.icon + ' text-lg"></i>' +
+            btn.innerHTML = 
+              '<div class="folder-left">' +
+                '<div class="folder-icon"><i class="fa-solid ' + f.icon + '"></i></div>' +
+                '<div class="folder-text">' +
+                  '<h3>' + f.label + '</h3>' +
+                  '<p>' + f.talents.length + ' CVs available</p>' +
+                '</div>' +
               '</div>' +
-              '<div class="flex-1 min-w-0">' +
-                '<p class="text-white font-semibold text-sm truncate">' + folder.label + '</p>' +
-                '<p class="text-white/50 text-xs mt-0.5">' + count + ' CV' + (count !== 1 ? 's' : '') + ' available</p>' +
-              '</div>' +
-              '<span class="text-xs font-bold px-2.5 py-1 rounded-full bg-[#007aff] text-white shrink-0">' +
-                count +
-              '</span>' +
-              '<i class="fa-solid fa-chevron-right w-4 h-4 text-white/30 group-hover:text-white/70 group-hover:translate-x-0.5 transition-all text-xs flex items-center justify-center"></i>';
-            
-            gridEl.appendChild(cardBtn);
-          });
-        } else {
-          if (secEl.className.indexOf('hidden') === -1) {
-            secEl.className += ' hidden';
+              '<div style="display:-webkit-flex; display:flex; align-items:center;">' +
+                '<span class="count-badge">' + f.talents.length + '</span>' +
+                '<i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.4;"></i>' +
+              '</div>';
+
+            grid.appendChild(btn);
           }
+        } else {
+          secDiv.className = "hidden";
         }
-      });
+      }
 
-      var emptyEl = document.getElementById('emptyState');
-      if (totalVisibleFolders === 0 && query !== "") {
-        document.getElementById('emptyText').innerText = 'No folders match "' + query + '".';
-        emptyEl.className = emptyEl.className.replace('hidden', '');
+      var emptyState = document.getElementById("emptyState");
+      if (visibleTotal === 0 && q !== "") {
+        emptyState.className = "center-box";
       } else {
-        if (emptyEl.className.indexOf('hidden') === -1) {
-          emptyEl.className += ' hidden';
-        }
+        emptyState.className = "center-box hidden";
       }
     }
 
     function handleSearch() {
-      renderUI();
+      renderFolders();
     }
 
     function openCVViewer(folder) {
-      activeFolder = folder;
-      var label = folder.label;
-      var folderTalents = folder.talents;
+      document.getElementById("viewerTitle").innerText = folder.label;
+      document.getElementById("viewerBadge").innerText = folder.talents.length + " CVs";
+      var container = document.getElementById("viewerSlidesContainer");
+      container.innerHTML = "";
 
-      document.getElementById('viewerTitle').innerText = label;
-      document.getElementById('viewerBadge').innerText = folderTalents.length + " CVs";
-
-      var slidesContainer = document.getElementById('viewerSlidesContainer');
-      slidesContainer.innerHTML = '';
-
-      if (folderTalents.length === 0) {
-        slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center text-white/50 text-sm">No CVs available in this folder.</div>';
+      if (folder.talents.length === 0) {
+        container.innerHTML = '<div class="center-box" style="width:100%;">No CVs in this folder.</div>';
       } else {
-        folderTalents.forEach(function(t, i) {
-          var slide = document.createElement('div');
-          slide.className = "snap-slide shrink-0 w-full sm:w-[78%] lg:w-[58%] xl:w-[46%] h-full flex flex-col";
+        for (var i = 0; i < folder.talents.length; i++) {
+          var t = folder.talents[i];
+          var slide = document.createElement("div");
+          slide.className = "cv-slide";
 
-          var cvHtml = t.cv 
-            ? '<img src="' + t.cv + '" alt="' + (t.name || 'Candidate CV') + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '" class="cv-image-contain" />'
-            : '<div class="text-white/40 text-xs">No CV file provided</div>';
+          var imgHtml = t.cv 
+            ? '<img src="' + t.cv + '" alt="CV" />' 
+            : '<div style="color:rgba(255,255,255,0.4); font-size:12px;">No CV Image Available</div>';
 
-          var externalBtn = t.cv 
-            ? '<a href="' + t.cv + '" target="_blank" rel="noreferrer" class="absolute top-2.5 left-2.5 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#007aff] text-white hover:opacity-90 transition-opacity"><i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Open Original</a>'
+          var openBtn = t.cv 
+            ? '<a href="' + t.cv + '" target="_blank" class="open-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Original</a>' 
             : '';
 
           slide.innerHTML = 
-            '<div class="relative flex-1 min-h-0 bg-black rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center">' +
-              cvHtml +
-              '<span class="absolute top-2.5 right-2.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-black/70 text-white backdrop-blur-sm">' +
-                (i + 1) + ' / ' + folderTalents.length +
-              '</span>' +
-              externalBtn +
+            '<div class="cv-frame">' +
+              imgHtml +
+              '<span class="counter-tag">' + (i + 1) + ' / ' + folder.talents.length + '</span>' +
+              openBtn +
             '</div>' +
-            '<div class="mt-2.5 px-1 shrink-0">' +
-              '<p class="text-white text-sm font-semibold truncate">' + (t.name || 'Unnamed Candidate') + '</p>' +
-              '<p class="text-white/55 text-xs truncate">' +
-                (t.job || 'No Job Specified') + ' • ' + (t.experience || 'N/A') + ' • ' + (t.country || 'N/A') +
+            '<div style="margin-top: 10px;">' +
+              '<p style="font-weight: 600; font-size: 14px;">' + (t.name || 'Unnamed Candidate') + '</p>' +
+              '<p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top:2px;">' +
+                (t.job || 'N/A') + ' • ' + (t.experience || 'N/A') + ' • ' + (t.country || 'N/A') +
               '</p>' +
             '</div>';
 
-          slidesContainer.appendChild(slide);
-        });
+          container.appendChild(slide);
+        }
       }
 
-      var modal = document.getElementById('cvViewerModal');
-      modal.className = modal.className.replace('hidden', '').trim() + ' flex';
+      var modal = document.getElementById("cvViewerModal");
+      modal.style.display = "-webkit-flex";
+      modal.style.display = "flex";
       document.body.style.overflow = "hidden";
     }
 
     function closeCVViewer() {
-      activeFolder = null;
-      var modal = document.getElementById('cvViewerModal');
-      modal.className = modal.className.replace('flex', '').trim();
-      if (modal.className.indexOf('hidden') === -1) {
-        modal.className += ' hidden';
-      }
-      document.body.style.overflow = "";
-      document.getElementById('viewerSlidesContainer').innerHTML = '';
+      var modal = document.getElementById("cvViewerModal");
+      modal.style.display = "none";
+      document.body.style.overflow = "auto";
     }
 
-    document.addEventListener("keydown", function(e) {
-      if (e.key === "Escape" && activeFolder) {
-        closeCVViewer();
-      }
-    });
-
-    window.onload = fetchTalentsData;
+    window.onload = loadData;
   </script>
 </body>
 </html>
