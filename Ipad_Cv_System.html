@@ -8,8 +8,11 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- FontAwesome Icons (Lucide Icon Equivalents) -->
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Babel Standalone (Old Browser ES6 to ES5 Converter) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
 
   <style>
     /* Custom Scrollbar Styling */
@@ -28,13 +31,26 @@
       background: #334155;
     }
 
-    /* Horizontal Snap Scroll Carousel */
+    /* Old iOS Safari Scroll Fixes */
     .snap-gallery {
+      -webkit-overflow-scrolling: touch !important;
       scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
+      -webkit-scroll-snap-type: mandatory;
+      -ms-scroll-snap-type: mandatory;
     }
     .snap-slide {
       scroll-snap-align: center;
+      -webkit-scroll-snap-align: center;
+    }
+    
+    /* Cross-browser Image Contain */
+    .cv-image-contain {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      -o-object-fit: contain;
     }
   </style>
 </head>
@@ -66,6 +82,7 @@
           type="text"
           id="searchInput"
           oninput="handleSearch()"
+          onkeyup="handleSearch()"
           placeholder="Search folders (role, country, type)…"
           class="w-full bg-[#1e293b] border border-white/10 focus:border-[#007aff] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-white/40 outline-none transition-colors"
         />
@@ -131,7 +148,6 @@
     <div class="flex items-center gap-3 px-3 sm:px-4 h-14 border-b border-white/10 bg-[#1e293b] shrink-0">
       <button
         onclick="closeCVViewer()"
-        className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
         class="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
       >
         <i class="fa-solid fa-arrow-left text-base"></i>
@@ -157,10 +173,10 @@
 
   <!-- ================= JAVASCRIPT CODE ================= -->
   <script>
-    const SUPABASE_URL = "https://ksyxmoqzcghszrhlpaxh.supabase.co"; 
-    const SUPABASE_KEY = "sb_publishable_U289_qf4pkGHp-G1C4kX5w_2bztcmOg";
+    var SUPABASE_URL = "https://ksyxmoqzcghszrhlpaxh.supabase.co"; 
+    var SUPABASE_KEY = "sb_publishable_U289_qf4pkGHp-G1C4kX5w_2bztcmOg";
 
-    const JOB_LABELS = {
+    var JOB_LABELS = {
       "House Maid": "Housemaid",
       "Baby sitting": "Baby Sitter",
       "Domestic Worker": "Domestic Worker",
@@ -169,69 +185,95 @@
       "Nurse": "Nurse"
     };
 
-    let talents = [];
-    let activeFolder = null;
+    var talents = [];
+    var activeFolder = null;
 
-    // Fetch talents data on initialization
-    async function fetchTalentsData() {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/talents?select=*&order=created_at.desc`, {
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json'
+    // Backward compatible AJAX Request for older iOS Browsers
+    function fetchTalentsData() {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", SUPABASE_URL + "/rest/v1/talents?select=*&order=created_at.desc", true);
+      xhr.setRequestHeader("apikey", SUPABASE_KEY);
+      xhr.setRequestHeader("Authorization", "Bearer " + SUPABASE_KEY);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            talents = JSON.parse(xhr.responseText);
+            document.getElementById('loadingState').className += ' hidden';
+            document.getElementById('totalCount').innerText = talents.length;
+            document.getElementById('totalBadge').className = document.getElementById('totalBadge').className.replace('hidden', '');
+            document.getElementById('sectionsContainer').className = document.getElementById('sectionsContainer').className.replace('hidden', '');
+            renderUI();
+          } catch (e) {
+            showError("JSON Parse Error: " + e.message);
           }
-        });
+        } else {
+          showError("HTTP error: " + xhr.status);
+        }
+      };
 
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+      xhr.onerror = function () {
+        showError("Network connection error.");
+      };
 
-        talents = await res.json();
-
-        document.getElementById('loadingState').classList.add('hidden');
-        document.getElementById('totalCount').innerText = talents.length;
-        document.getElementById('totalBadge').classList.remove('hidden');
-        document.getElementById('sectionsContainer').classList.remove('hidden');
-
-        renderUI();
-      } catch (err) {
-        document.getElementById('loadingState').classList.add('hidden');
-        document.getElementById('errorText').innerText = err.message;
-        document.getElementById('errorState').classList.remove('hidden');
-      }
+      xhr.send();
     }
 
-    // Build categories structure dynamically
+    function showError(msg) {
+      document.getElementById('loadingState').className += ' hidden';
+      document.getElementById('errorText').innerText = msg;
+      document.getElementById('errorState').className = document.getElementById('errorState').className.replace('hidden', '');
+    }
+
+    // Helper to get Unique Values safely for old JS engines
+    function getUniqueValues(arr, key) {
+      var flags = [], output = [], l = arr.length, i;
+      for(i=0; i<l; i++) {
+        if (arr[i][key]) {
+          if(flags[arr[i][key]]) continue;
+          flags[arr[i][key]] = true;
+          output.push(arr[i][key]);
+        }
+      }
+      return output.sort();
+    }
+
     function getSections() {
-      const housemaidTypes = [
+      var housemaidTypes = [
         {
           id: "recruitment",
           label: "Recruitment Housemaids",
           icon: "fa-users",
-          talents: talents.filter((t) => t.workerType === "Recruitment Workers")
+          talents: talents.filter(function(t) { return t.workerType === "Recruitment Workers"; })
         },
         {
           id: "returned",
           label: "Returned Housemaids",
           icon: "fa-users",
-          talents: talents.filter((t) => t.workerType === "Returned Housemaids")
+          talents: talents.filter(function(t) { return t.workerType === "Returned Housemaids"; })
         }
       ];
 
-      const jobs = [...new Set(talents.map((t) => t.job).filter(Boolean))].sort();
-      const jobRoles = jobs.map((j) => ({
-        id: `job-${j}`,
-        label: JOB_LABELS[j] || j,
-        icon: "fa-briefcase",
-        talents: talents.filter((t) => t.job === j)
-      }));
+      var jobs = getUniqueValues(talents, 'job');
+      var jobRoles = jobs.map(function(j) {
+        return {
+          id: 'job-' + j,
+          label: JOB_LABELS[j] || j,
+          icon: "fa-briefcase",
+          talents: talents.filter(function(t) { return t.job === j; })
+        };
+      });
 
-      const countries = [...new Set(talents.map((t) => t.country).filter(Boolean))].sort();
-      const countryFolders = countries.map((c) => ({
-        id: `country-${c}`,
-        label: c,
-        icon: "fa-globe",
-        talents: talents.filter((t) => t.country === c)
-      }));
+      var countries = getUniqueValues(talents, 'country');
+      var countryFolders = countries.map(function(c) {
+        return {
+          id: 'country-' + c,
+          label: c,
+          icon: "fa-globe",
+          talents: talents.filter(function(t) { return t.country === c; })
+        };
+      });
 
       return [
         { id: "housemaid", title: "Housemaid Types", folders: housemaidTypes },
@@ -240,56 +282,61 @@
       ];
     }
 
-    // Render Folder Cards (exact replication of FolderCard.jsx)
     function renderUI() {
-      const query = document.getElementById('searchInput').value.toLowerCase().trim();
-      const sections = getSections();
-      let totalVisibleFolders = 0;
+      var query = document.getElementById('searchInput').value.toLowerCase().trim();
+      var sections = getSections();
+      var totalVisibleFolders = 0;
 
-      sections.forEach((sec) => {
-        const gridEl = document.getElementById(`grid-${sec.id}`);
-        const secEl = document.getElementById(`sec-${sec.id}`);
+      sections.forEach(function(sec) {
+        var gridEl = document.getElementById('grid-' + sec.id);
+        var secEl = document.getElementById('sec-' + sec.id);
         gridEl.innerHTML = "";
 
-        const filteredFolders = sec.folders.filter(f => f.label.toLowerCase().includes(query));
+        var filteredFolders = sec.folders.filter(function(f) {
+          return f.label.toLowerCase().indexOf(query) !== -1;
+        });
 
         if (filteredFolders.length > 0) {
-          secEl.classList.remove('hidden');
+          secEl.className = secEl.className.replace('hidden', '');
           totalVisibleFolders += filteredFolders.length;
 
-          filteredFolders.forEach((folder) => {
-            const count = folder.talents.length;
-            const cardBtn = document.createElement('button');
+          filteredFolders.forEach(function(folder) {
+            var count = folder.talents.length;
+            var cardBtn = document.createElement('button');
             cardBtn.className = "group relative flex items-center gap-3 p-4 rounded-2xl bg-[#1e293b] hover:bg-[#29394d] border border-white/5 hover:border-[#007aff]/40 transition-all duration-200 text-left active:scale-[0.98]";
             
-            cardBtn.onclick = () => openCVViewer(folder);
+            cardBtn.onclick = function() { openCVViewer(folder); };
 
-            cardBtn.innerHTML = `
-              <div class="flex items-center justify-center w-11 h-11 rounded-xl bg-[#007aff]/15 text-[#007aff] shrink-0 group-hover:bg-[#007aff]/25 transition-colors">
-                <i class="fa-solid ${folder.icon} text-lg"></i>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-white font-semibold text-sm truncate">${folder.label}</p>
-                <p class="text-white/50 text-xs mt-0.5">${count} CV${count !== 1 ? 's' : ''} available</p>
-              </div>
-              <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-[#007aff] text-white shrink-0">
-                ${count}
-              </span>
-              <i class="fa-solid fa-chevron-right w-4 h-4 text-white/30 group-hover:text-white/70 group-hover:translate-x-0.5 transition-all text-xs flex items-center justify-center"></i>
-            `;
+            cardBtn.innerHTML = 
+              '<div class="flex items-center justify-center w-11 h-11 rounded-xl bg-[#007aff]/15 text-[#007aff] shrink-0 group-hover:bg-[#007aff]/25 transition-colors">' +
+                '<i class="fa-solid ' + folder.icon + ' text-lg"></i>' +
+              '</div>' +
+              '<div class="flex-1 min-w-0">' +
+                '<p class="text-white font-semibold text-sm truncate">' + folder.label + '</p>' +
+                '<p class="text-white/50 text-xs mt-0.5">' + count + ' CV' + (count !== 1 ? 's' : '') + ' available</p>' +
+              '</div>' +
+              '<span class="text-xs font-bold px-2.5 py-1 rounded-full bg-[#007aff] text-white shrink-0">' +
+                count +
+              '</span>' +
+              '<i class="fa-solid fa-chevron-right w-4 h-4 text-white/30 group-hover:text-white/70 group-hover:translate-x-0.5 transition-all text-xs flex items-center justify-center"></i>';
+            
             gridEl.appendChild(cardBtn);
           });
         } else {
-          secEl.classList.add('hidden');
+          if (secEl.className.indexOf('hidden') === -1) {
+            secEl.className += ' hidden';
+          }
         }
       });
 
-      const emptyEl = document.getElementById('emptyState');
+      var emptyEl = document.getElementById('emptyState');
       if (totalVisibleFolders === 0 && query !== "") {
-        document.getElementById('emptyText').innerText = `No folders match "${query}".`;
-        emptyEl.classList.remove('hidden');
+        document.getElementById('emptyText').innerText = 'No folders match "' + query + '".';
+        emptyEl.className = emptyEl.className.replace('hidden', '');
       } else {
-        emptyEl.classList.add('hidden');
+        if (emptyEl.className.indexOf('hidden') === -1) {
+          emptyEl.className += ' hidden';
+        }
       }
     }
 
@@ -297,98 +344,73 @@
       renderUI();
     }
 
-    // Open CV Viewer (exact replication of CVViewer.jsx)
     function openCVViewer(folder) {
       activeFolder = folder;
-      const { label, talents: folderTalents } = folder;
+      var label = folder.label;
+      var folderTalents = folder.talents;
 
       document.getElementById('viewerTitle').innerText = label;
-      document.getElementById('viewerBadge').innerText = `${folderTalents.length} CVs`;
+      document.getElementById('viewerBadge').innerText = folderTalents.length + " CVs";
 
-      const slidesContainer = document.getElementById('viewerSlidesContainer');
+      var slidesContainer = document.getElementById('viewerSlidesContainer');
       slidesContainer.innerHTML = '';
 
       if (folderTalents.length === 0) {
-        slidesContainer.innerHTML = `
-          <div class="w-full h-full flex items-center justify-center text-white/50 text-sm">
-            No CVs available in this folder.
-          </div>
-        `;
+        slidesContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center text-white/50 text-sm">No CVs available in this folder.</div>';
       } else {
-        folderTalents.forEach((t, i) => {
-          const slide = document.createElement('div');
+        folderTalents.forEach(function(t, i) {
+          var slide = document.createElement('div');
           slide.className = "snap-slide shrink-0 w-full sm:w-[78%] lg:w-[58%] xl:w-[46%] h-full flex flex-col";
 
-          slide.innerHTML = `
-            <div class="relative flex-1 min-h-0 bg-black rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center">
-              ${t.cv ? `
-                <img
-                  src="${t.cv}"
-                  alt="${t.name || 'Candidate CV'}"
-                  loading="${i < 2 ? 'eager' : 'lazy'}"
-                  class="max-w-full max-h-full w-auto h-auto object-contain"
-                  onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'text-white/40 text-xs p-4 text-center\\'>Unable to preview image directly.<br/><a href=\\'${t.cv}\\' target=\\'_blank\\' class=\\'text-[#007aff] underline mt-2 inline-block\\'>Click here to view PDF</a></div>';"
-                />
-              ` : `
-                <div class="text-white/40 text-xs">No CV file provided</div>
-              `}
+          var cvHtml = t.cv 
+            ? '<img src="' + t.cv + '" alt="' + (t.name || 'Candidate CV') + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '" class="cv-image-contain" />'
+            : '<div class="text-white/40 text-xs">No CV file provided</div>';
 
-              <!-- Counter Badge -->
-              <span class="absolute top-2.5 right-2.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-black/70 text-white backdrop-blur-sm">
-                ${i + 1} / ${folderTalents.length}
-              </span>
+          var externalBtn = t.cv 
+            ? '<a href="' + t.cv + '" target="_blank" rel="noreferrer" class="absolute top-2.5 left-2.5 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#007aff] text-white hover:opacity-90 transition-opacity"><i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Open Original</a>'
+            : '';
 
-              <!-- Open Original Button -->
-              ${t.cv ? `
-                <a
-                  href="${t.cv}"
-                  target="_blank"
-                  rel="noreferrer"
-                  class="absolute top-2.5 left-2.5 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#007aff] text-white hover:opacity-90 transition-opacity"
-                >
-                  <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
-                  Open Original
-                </a>
-              ` : ''}
-            </div>
-
-            <!-- Candidate Info Footer -->
-            <div class="mt-2.5 px-1 shrink-0">
-              <p class="text-white text-sm font-semibold truncate">${t.name || 'Unnamed Candidate'}</p>
-              <p class="text-white/55 text-xs truncate">
-                ${t.job || 'No Job Specified'} • ${t.experience || 'N/A'} • ${t.country || 'N/A'}
-              </p>
-            </div>
-          `;
+          slide.innerHTML = 
+            '<div class="relative flex-1 min-h-0 bg-black rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center">' +
+              cvHtml +
+              '<span class="absolute top-2.5 right-2.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-black/70 text-white backdrop-blur-sm">' +
+                (i + 1) + ' / ' + folderTalents.length +
+              '</span>' +
+              externalBtn +
+            '</div>' +
+            '<div class="mt-2.5 px-1 shrink-0">' +
+              '<p class="text-white text-sm font-semibold truncate">' + (t.name || 'Unnamed Candidate') + '</p>' +
+              '<p class="text-white/55 text-xs truncate">' +
+                (t.job || 'No Job Specified') + ' • ' + (t.experience || 'N/A') + ' • ' + (t.country || 'N/A') +
+              '</p>' +
+            '</div>';
 
           slidesContainer.appendChild(slide);
         });
       }
 
-      const modal = document.getElementById('cvViewerModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      var modal = document.getElementById('cvViewerModal');
+      modal.className = modal.className.replace('hidden', '').trim() + ' flex';
       document.body.style.overflow = "hidden";
     }
 
-    // Close Modal
     function closeCVViewer() {
       activeFolder = null;
-      const modal = document.getElementById('cvViewerModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+      var modal = document.getElementById('cvViewerModal');
+      modal.className = modal.className.replace('flex', '').trim();
+      if (modal.className.indexOf('hidden') === -1) {
+        modal.className += ' hidden';
+      }
       document.body.style.overflow = "";
       document.getElementById('viewerSlidesContainer').innerHTML = '';
     }
 
-    // Escape Key Listener
-    document.addEventListener("keydown", (e) => {
+    document.addEventListener("keydown", function(e) {
       if (e.key === "Escape" && activeFolder) {
         closeCVViewer();
       }
     });
 
-    // Run on startup
     window.onload = fetchTalentsData;
   </script>
 </body>
