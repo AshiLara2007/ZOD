@@ -73,6 +73,11 @@
       justify-content: center;
       margin-right: 12px;
     }
+    .logo-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: #ffffff;
+    }
     .title-main {
       font-size: 18px;
       font-weight: bold;
@@ -149,10 +154,10 @@
       background-color: #1e293b;
     }
 
-    /* Grid Layout without CSS `gap` property for Old iOS */
+    /* Grid Layout for Old iOS */
     .folder-grid {
       width: 100%;
-      font-size: 0; /* Remove inline-block spaces */
+      font-size: 0;
     }
     .folder-card-wrap {
       display: inline-block;
@@ -315,7 +320,7 @@
     }
     .cv-slide-box {
       display: inline-block;
-      vertical-align: middle;
+      vertical-align: top;
       width: 85%;
       max-width: 600px;
       height: 100%;
@@ -326,28 +331,39 @@
     .cv-image-frame {
       position: relative;
       width: 100%;
-      height: calc(100% - 45px);
+      height: calc(100% - 50px);
       background-color: #000000;
       border-radius: 12px;
       border: 1px solid #334155;
       overflow: hidden;
       text-align: center;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
     }
     .cv-image-frame img {
       max-width: 100%;
       max-height: 100%;
-      position: absolute;
-      top: 0; bottom: 0; left: 0; right: 0;
-      margin: auto;
+      width: auto;
+      height: auto;
+      display: block;
+      margin: 0 auto;
     }
     .tag-counter {
       position: absolute;
       top: 10px; right: 10px;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.85);
       color: #ffffff;
       font-size: 11px;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 10px;
+      z-index: 10;
     }
     .btn-open-link {
       position: absolute;
@@ -355,10 +371,18 @@
       background: #007aff;
       color: #ffffff;
       font-size: 11px;
-      padding: 6px 10px;
+      padding: 6px 12px;
       border-radius: 10px;
       text-decoration: none;
       font-weight: bold;
+      z-index: 10;
+    }
+
+    .img-error-box {
+      color: #94a3b8;
+      font-size: 13px;
+      text-align: center;
+      padding: 20px;
     }
 
     /* Utility */
@@ -457,7 +481,7 @@
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT FOR OLD IPAD ================= -->
+  <!-- ================= JAVASCRIPT FOR OLD IPAD CV FIX ================= -->
   <script>
     var SUPABASE_URL = "https://ksyxmoqzcghszrhlpaxh.supabase.co"; 
     var SUPABASE_KEY = "sb_publishable_U289_qf4pkGHp-G1C4kX5w_2bztcmOg";
@@ -477,31 +501,38 @@
 
     var talents = [];
 
+    // Safe Data Loader with Cross-Origin Compatibility
     function initData() {
       var xhr = new XMLHttpRequest();
-      xhr.open("GET", SUPABASE_URL + "/rest/v1/talents?select=*&order=created_at.desc", true);
+      var reqUrl = SUPABASE_URL + "/rest/v1/talents?select=*&order=created_at.desc";
+      
+      xhr.open("GET", reqUrl, true);
       xhr.setRequestHeader("apikey", SUPABASE_KEY);
       xhr.setRequestHeader("Authorization", "Bearer " + SUPABASE_KEY);
 
-      xhr.onload = function() {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            talents = JSON.parse(xhr.responseText);
-            document.getElementById("loadingState").className += " hidden";
-            document.getElementById("totalCount").innerText = talents.length;
-            document.getElementById("totalBadge").className = "badge-count";
-            document.getElementById("sectionsContainer").className = "";
-            filterFolders();
-          } catch(e) {
-            showError("JSON Error: " + e.message);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              var responseData = JSON.parse(xhr.responseText);
+              talents = responseData || [];
+              
+              document.getElementById("loadingState").className += " hidden";
+              document.getElementById("totalCount").innerText = talents.length;
+              document.getElementById("totalBadge").className = "badge-count";
+              document.getElementById("sectionsContainer").className = "";
+              filterFolders();
+            } catch(e) {
+              showError("JSON Parse Error: " + e.message);
+            }
+          } else {
+            showError("Database Error: Code " + xhr.status);
           }
-        } else {
-          showError("HTTP Error " + xhr.status);
         }
       };
 
       xhr.onerror = function() {
-        showError("Network connection failed.");
+        showError("Connection Failed. Check internet or SSL settings.");
       };
 
       xhr.send();
@@ -532,12 +563,18 @@
         {
           label: "Recruitment Housemaids",
           icon: SVG_FOLDER,
-          talents: talents.filter(function(t) { return t.workerType === "Recruitment Workers"; })
+          talents: talents.filter(function(t) { 
+            var wType = t.workerType || t.workertype || t.worker_type || "";
+            return wType === "Recruitment Workers"; 
+          })
         },
         {
           label: "Returned Housemaids",
           icon: SVG_FOLDER,
-          talents: talents.filter(function(t) { return t.workerType === "Returned Housemaids"; })
+          talents: talents.filter(function(t) { 
+            var wType = t.workerType || t.workertype || t.worker_type || "";
+            return wType === "Returned Housemaids"; 
+          })
         }
       ];
 
@@ -616,6 +653,7 @@
       }
     }
 
+    // Modal with Safe Image Loader
     function openModal(folder) {
       document.getElementById("modalTitle").innerText = folder.label;
       document.getElementById("modalBadge").innerText = folder.talents.length + " CVs";
@@ -623,30 +661,41 @@
       vp.innerHTML = "";
 
       if (folder.talents.length === 0) {
-        vp.innerHTML = '<div class="status-msg">No CVs in this folder</div>';
+        vp.innerHTML = '<div class="status-msg">No CVs found in this folder</div>';
       } else {
         for (var i = 0; i < folder.talents.length; i++) {
           var c = folder.talents[i];
+          
+          // Fallback for CV URL column naming (cv / cv_url / cvUrl)
+          var cvUrl = c.cv || c.cv_url || c.cvUrl || "";
+
           var slide = document.createElement("div");
           slide.className = "cv-slide-box";
 
-          var img = c.cv 
-            ? '<img src="' + c.cv + '" alt="CV" />' 
-            : '<div style="color:#94a3b8; padding-top:100px;">No CV Image</div>';
+          var imgHtml = "";
+          var linkHtml = "";
 
-          var link = c.cv 
-            ? '<a href="' + c.cv + '" target="_blank" class="btn-open-link">Open Original</a>' 
-            : '';
+          if (cvUrl !== "") {
+            imgHtml = '<img src="' + cvUrl + '" alt="CV" onerror="this.onerror=null; this.parentNode.innerHTML=\'<div class=\\\’img-error-box\\\’>Unable to display image preview on Old iPad Safari.<br><br><a href=\\\'' + cvUrl + '\\\’ target=\\\'_blank\\\’ style=\\\’color:#007aff; font-weight:bold;\\\’>Click here to view original CV</a></div>\';" />';
+            linkHtml = '<a href="' + cvUrl + '" target="_blank" class="btn-open-link">Open Original</a>';
+          } else {
+            imgHtml = '<div class="img-error-box">No CV Image URL attached</div>';
+          }
+
+          var nameText = c.name || c.candidate_name || 'Unnamed Candidate';
+          var jobText = c.job || c.job_role || 'N/A';
+          var expText = c.experience || c.exp || 'N/A';
+          var countryText = c.country || 'N/A';
 
           slide.innerHTML = 
             '<div class="cv-image-frame">' +
-              img +
+              imgHtml +
               '<span class="tag-counter">' + (i + 1) + ' / ' + folder.talents.length + '</span>' +
-              link +
+              linkHtml +
             '</div>' +
             '<div style="margin-top:8px;">' +
-              '<div style="color:#ffffff; font-weight:bold;">' + (c.name || 'Unnamed Candidate') + '</div>' +
-              '<div style="color:#94a3b8; font-size:12px;">' + (c.job || 'N/A') + ' • ' + (c.experience || 'N/A') + ' • ' + (c.country || 'N/A') + '</div>' +
+              '<div style="color:#ffffff; font-weight:bold; font-size:14px;">' + nameText + '</div>' +
+              '<div style="color:#94a3b8; font-size:12px; margin-top:2px;">' + jobText + ' • Exp: ' + expText + ' • ' + countryText + '</div>' +
             '</div>';
 
           vp.appendChild(slide);
